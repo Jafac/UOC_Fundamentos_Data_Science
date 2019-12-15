@@ -16,6 +16,8 @@ output:
     highlight: zenburn
     toc: yes
   word_document: default
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -146,7 +148,7 @@ El código R que utilizaremos en la práctica se divide en apartados según las 
 ******
 Antes de pasar a la importación y análisis de los datos definimos un directorio de trabajo o carpeta donde tenéis guardado el fichero de datos. Recordad que si abrís el RStudio desde vuestro directorio de trabajo, pulsando sobre el fichero .RMD que se os proporciona como parte del enunciado, este paso no haría falta.
 ```{r,eval=TRUE,echo=TRUE}
-#setwd("Pon aquí el directorio utilizado")
+setwd("C:\\Users\\acamp\\OneDrive\\Documentos\\UOC\\proyectos_git\\UOC_Fundamentos_Data_Science\\B0.477-20191-PEC02")
 #Cambiar el argumento de setwd() con vuestro directorio, recordad utilizad las barras /.
 ```
 
@@ -432,8 +434,26 @@ Dibuja un gráfico equivalente, tomando como referencia la suma de cuadrados en 
 Escriba su respuesta aquí
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+set.seed(123)
+wss <- kmeans(clus_norm,centers=1)$tot.withinss
+ for (i in 2:10) wss[i] <- kmeans(clus_norm,centers=i)$tot.withinss
+
+plot(1:10, wss, type="l", xlab="Número de grupos",ylab="Sumas de cuadrados dentro de cada grupo (conjunto)")
 ```
+
+En kmeans, la suma de cuadrados '$tot.withinss' debe ser minima. Pero tambien debemos considerar tener un numero de clusters adecuados (no muy grande).
+
+Se pueden usar varios criterios para definir que numero de clusters cojemos, uno de los mas famosos es el criterio del codo (https://en.wikipedia.org/wiki/Elbow_method_(clustering)). Usaremos mas grupos para ver mejor el "codo".
+
+```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
+set.seed(123)
+wss <- kmeans(clus_norm,centers=1)$tot.withinss
+ for (i in 2:20) wss[i] <- kmeans(clus_norm,centers=i)$tot.withinss
+
+plot(1:20, wss, type="l", xlab="Número de grupos",ylab="Sumas de cuadrados dentro de cada grupo (conjunto)")
+```
+
+Yo haria una propuesta de 5 clusters.
 
 ******
 ## Ejercicio 2
@@ -445,8 +465,12 @@ Construir una clusterización en 7 clusters utilizando el algoritmo kmeans. Repr
 ******
 Escriba su respuesta aquí
 
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+```{r,eval=TRUE,echo=TRUE}
+NumCluster=7
+set.seed(123)
+Modelo=kmeans(clus_norm,NumCluster)
+clus_kmeans$clusterKmeans= Modelo$cluster
+aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans)
 ```
 
 ******
