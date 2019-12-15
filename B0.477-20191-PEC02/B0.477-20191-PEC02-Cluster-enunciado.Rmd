@@ -431,7 +431,6 @@ Dibuja un gráfico equivalente, tomando como referencia la suma de cuadrados en 
 ******
 ## Respuesta 1
 ******
-Escriba su respuesta aquí
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
 set.seed(123)
@@ -466,12 +465,20 @@ Construir una clusterización en 7 clusters utilizando el algoritmo kmeans. Repr
 Escriba su respuesta aquí
 
 ```{r,eval=TRUE,echo=TRUE}
-NumCluster=7
+clus_kmeans7=clus
+NumCluster7=7
 set.seed(123)
-Modelo=kmeans(clus_norm,NumCluster)
-clus_kmeans$clusterKmeans= Modelo$cluster
-aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans)
+Modelo7=kmeans(clus_norm,NumCluster7)
+clus_kmeans7$clusterKmeans= Modelo7$cluster
+aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans7)
 ```
+
+El grupo 1 esta formado por los asegurados más fieles (más años en la compañia).
+El grupo 2 esta formado por los conductores más antiguos (más años con el permiso).
+El grupo 3 esta formado por la mayoria de siniestrados.
+El grupo 4 tiene caracteristicas de los grupos 1, 2, 3 y 5.
+El grupo 5 esta formado por los que tienen un vehiculo antiguo.
+El grupo 7 esta formado por los asegurados mas jovenes.
 
 ******
 ## Ejercicio 3
@@ -482,12 +489,44 @@ aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans)
 ## Respuesta 3
 ******
 
-Escriba su respuesta aquí
+En el algoritmo jerarquico se empieza con todos los datos y se van agrupando siguiendo una metrica de distancia. Siempre da el mismo resultado. Por otro lado, kmeans empieza eligiendo k centroides de forma aleatoria por eso necesitamos 'set.seed()' para poder reproducir los mismos resultados.
+
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+set.seed(456)
+clus_jerarquico456=clus
+distances456 = dist(clus_norm, method = "euclidean")
+clus_norm_Jerarquico456 = hclust(distances456, method = "ward.D")
+clus_jerarquico456$clusterJerar= cutree(clus_norm_Jerarquico456, k = 7)
+table(clus_jerarquico456$clusterJerar)
+
+set.seed(123)
+clus_jerarquico456=clus
+distances456 = dist(clus_norm, method = "euclidean")
+clus_norm_Jerarquico456 = hclust(distances456, method = "ward.D")
+clus_jerarquico456$clusterJerar= cutree(clus_norm_Jerarquico456, k = 7)
+table(clus_jerarquico456$clusterJerar)
 ```
 
+Se puede comprobar que los valores de kmeans son iguales aunque cambiemos la 'semilla'.
+
+```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
+set.seed(456)
+modelo_k7<-kmeans(clus_norm,centers=7)
+modelo_k7$totss
+modelo_k7$withinss
+modelo_k7$betweenss
+
+set.seed(123)
+modelo_k7<-kmeans(clus_norm,centers=7)
+modelo_k7$totss
+modelo_k7$withinss
+modelo_k7$betweenss
+```
+
+Se puede comprobar que los valores de kmeans son distintos cuando cambiamos la 'semilla'.
+Como curiosidad, la suma de cuadrados totales (totss) es igual en los dos 'semillas' por que el algoritmo hace iteraciones sobre los datos hasta que no puede mejorar la variable 'totss', lo que significa que para esas dos semillas convergen en soluciones "iguales". 
+Hablamos de una solución 'local' ya que es la mejor que hemos podido encontrar con la disposición inicial de los centroides. 
 
 ******
 ## Ejercicio 4
@@ -501,7 +540,8 @@ En el apartado de *_representación gráfica de variables por cluster_* del algo
 Escriba su respuesta aquí
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+plot(clus_jerarquico[c("ant_veh","edad")], xlab="Antiguedad del vehicul", ylab="Edad",col=clus_jerarquico$clusterJerar) 
+title(main="Nube de puntos agrupados", col.main="blue", font.main=1)
 ```
 
 
@@ -514,11 +554,13 @@ En el apartado de Manipulación y representación de variables se ha realizado u
 ## Respuesta 5
 ******
 
-Escriba su respuesta aquí
-
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+```{r,eval=TRUE,echo=TRUE}
+table(Cartera$gdi,Cartera$sin)
+barplot(prop.table(table(Cartera$gdi,Cartera$sin)),col=c("darkblue","red"))
+legend(5,0.8,c("Contratada","No contratada"),fill = c("darkblue","red"))
 ```
+
+No parace haber una relación clara entre el numero de siniestros y la contratación de la garantia de daños propios. Para los siniestros con suficientes datos (0 - 3) la proporcion de contratado / no contratado es de aproximadamente el 70%, por tanto, las variables son independientes.
 
 ******
 ## Ejercicio 6
