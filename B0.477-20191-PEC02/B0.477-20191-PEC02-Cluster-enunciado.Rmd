@@ -570,12 +570,39 @@ Al presentar los resultados al responsable del negocio, este nos indica que le g
 ******
 ## Respuesta 6
 ******
-Escriba su respuesta aquí
 
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+```{r,eval=TRUE,echo=TRUE}
+clus6<-Cartera[,c("sin","ant_comp","ant_perm","edad","ant_veh","sri")]
+clus_norm6<-clus6
+
+clus_norm6[,c("sin")] <- (clus6$sin-mean(clus6$sin))/sd(clus6$sin)
+clus_norm6[,c("ant_comp")] <- (clus6$ant_comp-mean(clus6$ant_comp))/sd(clus6$ant_comp)
+clus_norm6[,c("ant_perm")] <- (clus6$ant_perm-mean(clus6$ant_perm))/sd(clus6$ant_perm)
+clus_norm6[,c("edad")] <- (clus6$edad-mean(clus6$edad))/sd(clus6$edad)
+clus_norm6[,c("ant_veh")] <- (clus6$ant_veh-mean(clus6$ant_veh))/sd(clus6$ant_veh)
+aux <- as.numeric(clus6$sri)
+clus_norm6[,c("sri")] <- (aux-mean(aux))/sd(aux)
 ```
 
+```{r,eval=TRUE,echo=TRUE}
+head(clus6$sri, 2)
+head(aux, 2)
+```
+
+1 = No urbano
+2 = Urbano
+
+```{r,eval=TRUE,echo=TRUE}
+
+clus_kmeans6=clus6
+NumCluster6=4
+set.seed(123)
+Modelo6=kmeans(clus_norm6,NumCluster6)
+clus_kmeans6$clusterKmeans= Modelo6$cluster
+aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans6)
+```
+
+Para numeros cercanos a 1, hay más datos con factor 'No urbano'. Para numeros cercanos a 2, hay más datos con factor 'Urbano'
 
 ******
 ## Ejercicio 7
@@ -589,6 +616,42 @@ En el apartado de asignación de clusters del algorimto kmeans se ha asignado a 
 Escriba su respuesta aquí
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+NumCluster=5
+set.seed(123)
+
+Modelo=kmeans(clus_norm,NumCluster)
+clus_kmeans$clusterKmeans= Modelo$cluster
+head(clus_kmeans)
+aggregate(.~clusterKmeans,FUN=mean, data=clus_kmeans)
+
+
+clus_jerarquico$clusterJerar= cutree(clus_norm_Jerarquico, k = NumCluster)
+head(clus_jerarquico)
+aggregate(.~clusterJerar,FUN=mean, data=clus_jerarquico)
 ```
 
+Podemos ver que los valores representados en cada grupo son distintos, por tanto, no son los mismos segmentos.
+
+Hemos usado el paquete 'data.table' para hacer la tabla:
+```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
+#install.packages('data.table')
+library(data.table)
+DTkmeans <- data.table(clus_kmeans)
+DT1 <- DTkmeans[, .N, by = clusterKmeans]
+DT1
+
+DTjerarquico <- data.table(clus_jerarquico)
+DT2 <- DTjerarquico[, .N, by = clusterJerar]
+DT2
+
+tabla <- data.table(
+  kmeans = DT1[order(clusterKmeans),N],
+  jerarquico = DT2[order(clusterJerar),N]
+)
+```
+
+Ahora ya podemos ver la tabla:
+
+```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
+tabla
+```
