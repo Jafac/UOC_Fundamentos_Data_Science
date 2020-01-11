@@ -1,6 +1,6 @@
 ---
 title: 'Algoritmos de clasificación: SVM, Árboles de decisión simples y múltiples (random forest)'
-author: "UOC - Master BI - Business Analytics (Nombre Estudiante)"
+author: "UOC - Master BI - Business Analytics (Albert Campano)"
 date: "Diciembre del 2019"
 output:
   html_document:
@@ -15,6 +15,8 @@ output:
     highlight: zenburn
     toc: yes
   word_document: default
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -183,6 +185,7 @@ library("useful")
 library("randomForest")
 
 # Cargamos el fichero de datos que utilizamos para desarrollar la PEC
+setwd("C:/Users/acamp/OneDrive/Documentos/UOC/proyectos_git/UOC_Fundamentos_Data_Science/B0.477-20191-PEC03")
 nombreruta_PEC <- paste(getwd(),"/PEC3.csv", sep = "")
 Data_PEC <- read.csv(nombreruta_PEC, encoding="UTF-8",
                       header=TRUE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
@@ -275,7 +278,7 @@ f8
 # Relación entre variables Km y Visitas con tamaño margen
 f9<-ggplot(Data_PEC, aes(x=Km, y=Visitas)) + geom_point(aes(size=Margen))
 f9
-# Relación entre variables Km y Visitas con tamaño margen
+# Relación entre variables Km y Margen con tamaño ingresos
 fA<-ggplot(Data_PEC, aes(x=Km, y=Margen)) + geom_point(aes(size=Ingresos))
 fA
 
@@ -492,11 +495,17 @@ predicions_on_test_rf  = predict(model_random_forest,  testData[,1:4], type = 'c
 
 ## Respuesta 1 
 
-Escriba su respuesta aquí
-
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
 #Escriba su código aquí
+sum(predicions_on_train_rf == trainData$Comercial)/ length(trainData$Comercial)*100
+
+sum(predicions_on_test_rf == testData$Comercial)/ length(testData$Comercial)*100
 ```
+
+En el caso de la predicción con datos de entrenamiento, en general el modelo es mucho más preciso ya que se estan usando los mismos datos con los que se ha creado el modelo. Este se entiende como que el modelo esta sobreentrenado (para los datos que se estan usando para la validación) lo que conlleva a un ejemplo de overfitting (https://en.wikipedia.org/wiki/Overfitting)
+
+Se debe usar los datos de test para validar que el algoritmo "funcionara" para todos los posibles datos que existen.
+
 ## Pregunta 2
 
 En el apartado Proceso de clasificación mediante Árboles de decisión simples se ha construido un modelo utilizando como variables independientes las variables Ingresos, Margen, Km y Visitas.
@@ -507,11 +516,30 @@ Comente los resultados obtenidos
 
 ### Respuesta 2
 
-Escriba su respuesta aquí
+Primero calculamos el porcentaje de acierto del modelo anterior para poder comparar:
+```{r}
+table(preds_tree, testData$Comercial)
 
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+sum(preds_tree == testData$Comercial)/ length(testData$Comercial)*100
 ```
+
+Ahora calcularemos el model_tree2:
+```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
+# Declaramos función del árbol
+ArbolRpart2 = Comercial ~ Ingresos + Margen
+# Aplicamos algoritmo
+model_tree2 = rpart(ArbolRpart2, method="class", data=trainData)
+# Validamos la capacidad de predicción del árbol con el fichero de validación
+preds_tree2 <- predict(model_tree2, newdata = testData, type = "class")
+# Visualizamos una matriz de confusión
+table(preds_tree2, testData$Comercial)
+# Calculamos el % de aciertos 
+sum(preds_tree2 == testData$Comercial)/ length(testData$Comercial)*100
+```
+
+El porcentaje de aciertos ha descendido drasticamente. Esto es debido a que una parte crucial de la información ha quedado fuera del modelo.
+
+Es normal que si modelamos "la realidad" solo con parte de la información no consigamos crear modelos precisos.
 
 ## Pregunta 3
 
