@@ -541,6 +541,21 @@ El porcentaje de aciertos ha descendido drasticamente. Esto es debido a que una 
 
 Es normal que si modelamos "la realidad" solo con parte de la información no consigamos crear modelos precisos.
 
+Mostramos el arbol:
+```{r}
+rpart.plot(model_tree2,extra=4)
+```
+
+Mostramos el arbol podado:
+```{r}
+# Podado del árbol
+pruned_tree_model2 <- prune(model_tree2, cp= model_tree2$cptable[which.min(model_tree2$cptable[,"xerror"]),"CP"])
+pruned_tree_model2 <- prune(pruned_tree_model2, cp= 0.02)
+# Representación del árbol podado
+rpart.plot(pruned_tree_model2,extra=4) #visualizamos el árbol
+```
+
+
 ## Pregunta 3
 
 Explique con sus palabras en qué consiste el algoritmo SVM y qué importancia tiene el Kernel utilizado. Teniendo ésto en cuenta, ¿normalizar los datos mejora la clasificación? Ilustre su respuesta con un ejemplo.
@@ -569,11 +584,32 @@ Comparar los modelos dos a dos (3 comparaciones) para identificar si hay diferen
 
 ## Respuesta 4
 
-Escriba su respuesta aquí
-
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+Primero comparamos SVM con el arbol de decisión:
+```{r}
+table(preds_svm, testData$Comercial)
+table(preds_tree, testData$Comercial)
+table(preds_svm, preds_tree)
 ```
+
+Como podemos ver los dos modelos classifican de la misma forma.
+
+Ahora compararemos SVM con random forest:
+```{r}
+table(preds_svm, testData$Comercial)
+table(preds_random_forest, testData$Comercial)
+table(preds_svm, preds_random_forest)
+```
+En este este caso vemos que difieren. En concreto 1 elemento que SVM predice como commercial B, en random forest se predice com C.
+
+
+Por ultimo, compararemos arbol de decisión con random forest (deberia ser igual a la comparación anterior ya que SVM y arbol de decisión clasifican igual):
+```{r}
+table(preds_tree, testData$Comercial)
+table(preds_random_forest, testData$Comercial)
+table(preds_tree, preds_random_forest)
+```
+Como podemos ver, obtenemos el mismo resultado que en la comparación anterior.
+
 
 ## Pregunta 5
 
