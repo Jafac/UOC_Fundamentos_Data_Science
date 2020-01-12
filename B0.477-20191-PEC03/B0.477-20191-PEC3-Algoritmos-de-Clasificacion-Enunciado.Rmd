@@ -621,10 +621,12 @@ En el gráfico f10 mostramos la relación entre las variables Visitas, KM e Ingr
 grp <- (preds_svm == testData$Comercial)
 ```
 
+
 ```{r}
 plot51 <- ggplot(testData, aes(x=Km, y=Margen, color=Comercial)) + geom_point(aes(shape=factor(grp), size=1))
 plot51
 ```
+
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
 plot52 <- ggplot(testData, aes(x=Km, y=Margen, color=preds_svm)) + geom_point(aes(shape=factor(grp), size=1))
