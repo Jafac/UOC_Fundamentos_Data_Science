@@ -1,0 +1,1828 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Algoritmos de clasificación: SVM, Árboles de decisión simples y múltiples (random forest)},
+            pdfauthor={UOC - Master BI - Business Analytics (Albert Campano)},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{48,48,48}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.94,0.87,0.69}{#1}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.87,0.87,0.75}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.86,0.86,0.80}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.86,0.64,0.64}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.75,0.75,0.82}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.86,0.64,0.64}{\textbf{#1}}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.86,0.64,0.64}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.86,0.64,0.64}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.80,0.58,0.58}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.80,0.58,0.58}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.80,0.58,0.58}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{\textbf{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.94,0.94,0.56}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.94,0.94,0.56}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.94,0.87,0.69}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.94,0.94,0.82}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{1.00,0.81,0.69}{\textbf{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{\textbf{#1}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{\textbf{#1}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.81,0.69}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.76,0.75,0.62}{#1}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{Algoritmos de clasificación: SVM, Árboles de decisión simples y
+múltiples (random forest)}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{UOC - Master BI - Business Analytics (Albert Campano)}
+  \preauthor{\centering\large\emph}
+  \postauthor{\par}
+  \predate{\centering\large\emph}
+  \postdate{\par}
+  \date{Diciembre del 2019}
+
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Introducción}\label{introduccion}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Descripción de la PEC a
+realizar}\label{descripcion-de-la-pec-a-realizar}
+
+La prueba está estructurada en 8 ejercicios teórico-prácticos que piden
+que se desarrolle la fase de preparación y estimación de un modelo
+utilizando un juego de datos.
+
+Deben responderse al menos 5 de los 8 ejercicios para poder superar la
+PEC. Para optar a la máxima nota tienen que responderse todos los
+ejercicios de forma correcta.
+
+\subsection{Criterios de evaluación}\label{criterios-de-evaluacion}
+
+\textbf{Ejercicios teóricos}\\
+Todos los ejercicios deben ser presentados de forma razonada y clara. No
+se aceptará ninguna respuesta que no esté claramente justificada.
+
+\textbf{Ejercicios prácticos}\\
+Para todas las PEC es necesario documentar en cada ejercicio práctico
+qué se ha hecho y cómo se ha hecho.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+Pregunta & Criterio de valoración & Peso\tabularnewline
+\midrule
+\endhead
+1 & se muestran los resultados en entrenamiento y validación &
+5\%\tabularnewline
+1 & se jutifican los resultados & 5\%\tabularnewline
+2 & se entrenan el modelo & 5\%\tabularnewline
+2 & se visualiza el modelo & 5\%\tabularnewline
+2 & se responde a la pregunta & 5\%\tabularnewline
+3 & Se define el algortimo SVM & 5\%\tabularnewline
+3 & Se explica el funcionamiento del Kernel & 5\%\tabularnewline
+3 & Se entrena y evalua el modelo con datos normalizados &
+5\%\tabularnewline
+3 & Se entrena y evalua el modelo con datos no normalizados &
+5\%\tabularnewline
+4 & Se muestras tablas con las comparaciones & 5\%\tabularnewline
+4 & Se comparan y explican los resultados & 5\%\tabularnewline
+5 & Se realizan los dos gráficos & 5\%\tabularnewline
+5 & Se colorean los gráficos y se da la forma adecuada &
+10\%\tabularnewline
+6 & Se entrena el modelo solicitado & 5\%\tabularnewline
+6 & Se compara el resultado con el otro modelo & 5\%\tabularnewline
+7 & Se construye el modelo ensamblado & 10\%\tabularnewline
+7 & Se calcula el acierto del modelo & 5\%\tabularnewline
+8 & Se responde a la pregunta & 5\%\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Formato y fecha de entega}\label{formato-y-fecha-de-entega}
+
+El formato de entrega es: studentname-PECn.html\\
+Fecha de Entrega: 12/01/2020\\
+Se debe entregar la PEC en el buzón de entregas del aula
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Base teórica}\label{base-teorica}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Esta práctica se basa en un ejemplo de \textbf{algoritmos de
+clasificación}. Durante la práctica se ilustran conceptos generales de
+metodologías de clasificación de algoritmos así como algunas técnicas
+habituales como son \textbf{SVM} y \textbf{Árboles de decisión}.
+
+Cuando se trabajan con algoritmos de clasificación, es importante
+preparar de forma adecuada los conjuntos de entrenamiento (train set) y
+validación (validation set o test set). Los modelos se entrenan
+estrictamente con el conjunto de entrenamiento y, a continuación, se
+valida el modelo resultante sobre el conjunto de validación. Lo habitual
+es que el algoritmo funcione mejor con los datos de entrenamiento que
+con los datos de validación (que nunca ha visto antes). Si la diferencia
+entre la capacidad predictiva en el conjunto de entrenamiento es muy
+superior a la capacidad predictiva en el conjunto de validación estamos
+ante un problema de sobreajuste o sobreentrenamiento
+(\textbf{overfitting}) y es uno de los puntos clave a tener en cuenta
+cuando se implementa un sistema de clasificación. Si la capacidad
+predictiva en ambos conjuntos es similar, esta métrica refleja la
+capacidad del modelo de generar resultados correctos frente a datos a
+los que no ha estado expuesto previamente.
+
+\textbf{SVM (Support Vector Machines o máquinas de soporte vectorial)}
+tiene como objetivo encontrar el hiperplano óptimo que maximiza el
+margen entre clases (variable objetivo) del juego de datos de
+entrenamiento. Definiremos el margen como la zona de separación entre
+los distintos grupos a clasificar. Esta zona de separación quedará
+delimitada a través de hiperplanos. Las SVM buscan maximizar el margen
+entre los puntos pertenecientes a los distintos grupos a clasificar.
+Maximizar el margen implica que el hiperplano de decisión o separación
+esté diseñado de tal forma que el máximo número de futuros puntos queden
+bien clasificados
+
+Los \textbf{Árboles de decisión} son algoritmos que construyen modelos
+de decisión que forman estructuras similares a los diagramas de flujo,
+donde los nodos internos suelen ser puntos de decisión sobre un atributo
+del juego de datos. Son muy dependientes del concepto de ganancia de la
+información ya que es el criterio que utilizan para construir las
+ramificaciones del árbol. A grandes rasgos existen dos tipos de árboles
+de decisión: * \emph{Árboles de decisión simples}: el resultado se
+construye mediante un proceso de clasificación. * \emph{Árboles de
+decisión múltiples (random forest)}: el resultado se construye mediante
+el desarrollo iterativo de \emph{n} procesos de clasificación.
+
+Aparte de los modelos propuestos en esta práctica, existe una gran
+variedad de alternativas de distinta complejidad, como los
+\textbf{modelos lineales generalizados}, los \textbf{métodos basados en
+kernel} o \textbf{redes neuronales}.
+
+\textbf{Recursos en la web:}
+
+\begin{itemize}
+\item
+  \href{https://es.wikipedia.org/wiki/K-vecinos_m\%C3\%A1s_cercanos}{Wikipedia:
+  K-NN (k-vecinos más cercanos)}\\
+\item
+  \href{https://es.wikipedia.org/wiki/\%C3\%81rbol_de_decisi\%C3\%B3n}{Wikipedia:
+  Árbol de decisión simple}\\
+\item
+  \href{https://es.wikipedia.org/wiki/Random_forest}{Wikipedia: Árbol de
+  decisión múltiple (Random forest)})
+\item
+  \href{https://saravananthirumuruganathan.wordpress.com/2010/05/17/a-detailed-introduction-to-k-nearest-neighbor-knn-algorithm/}{A
+  Detailed Introduction to K-Nearest Neighbor (K-NN) Algorithm}
+\item
+  \href{http://www.r-bloggers.com/a-brief-tour-of-the-trees-and-forests/}{A
+  Brief Tour of the Trees and Forests}
+\item
+  {[}Linear classifiers{]}
+  \url{https://en.wikipedia.org/wiki/Linear_classifier}
+\item
+  {[}Generalized linear models{]}
+  \url{https://es.wikipedia.org/wiki/Modelo_lineal_generalizado}
+\item
+  {[}Kernel methods \& SVM{]}
+  \url{https://en.wikipedia.org/wiki/Kernel_method}
+\item
+  {[}Neural networks{]}
+  \url{https://en.wikipedia.org/wiki/Artificial_neural_network}
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Caso de estudio: Clasificación red de ventas Bodegas
+Mureda}\label{caso-de-estudio-clasificacion-red-de-ventas-bodegas-mureda}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Formamos parte de la Dirección Comercial de la Bodega de vinos
+\textbf{Mureda} y queremos analizar la actividad de nuestra red de
+ventas, formada por tres categorías de comerciales (A, B y C). Para
+ello, estamos interesados en conocer: * si existen diferencias en la
+actividad generada por cada uno de los comerciales * en caso afirmativo:
+* identificar cuáles son las variables que más contribuyen a dichas
+diferencias * predecir a qué categoría de comercial pertenece un nuevo
+empleado en función de su actividad.
+
+Para ello, nuestro equipo de análisis dispone de un fichero con
+información de 150 clientes que recoge estadísticas de actividad de los
+tres grupos de Comerciales, a razón de 50 registros por grupo de
+comercial. El fichero contiene información de las siguientes variables:
+
+\begin{itemize}
+\item
+  \emph{Importe}: Volumen de Facturación en el Cliente (vinculado a una
+  categoría de Comercial)
+\item
+  \emph{Margen}: Margen por Cliente (vinculado a una categoría de
+  Comercial)
+\item
+  \emph{Km}: Kilómetros recorridos para visitar al Cliente.
+\item
+  \emph{Visitas}: Visitas realizadas al Cliente.
+\item
+  \emph{Comercial}: Categoría de comercial asignada al cliente (Toma
+  valores A, B ó C)
+\end{itemize}
+
+Una vez definidos los objetivos de nuestra investigación, nuestro
+departamento de análisis nos propone desarrollar un proceso de
+clasificación que aplique distintos modelos y que estudiemos qué
+algoritmos nos permiten extraer mejores resultados sobre nuestro
+conjunto de datos.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Apartados de la práctica}\label{apartados-de-la-practica}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+El código R que utilizaremos en la práctica se divide en apartados según
+las tareas que iremos realizando:
+
+\textbf{Apartados práctica:}
+
+\begin{itemize}
+\item
+  Carga de paquetes necesarios y fichero
+\item
+  Análisis univariable y bivariable de los datos
+
+  \begin{itemize}
+  \item
+    Descriptivos de las variables del fichero
+  \item
+    Estudio de la relación entre variables
+  \item
+    Comparación de las variables por tipo de Comercial
+  \end{itemize}
+\item
+  Preparación de los conjuntos de entrenamiento y validación
+\item
+  Clasificación de los clientes con \emph{SVM}
+
+  \begin{itemize}
+  \item
+    Construcción del Modelo de clasificación con \emph{SVM}
+  \item
+    Validación del Modelo de clasificación con \emph{SVM}
+  \end{itemize}
+\item
+  Clasificación de los clientes con árboles de decisión simples
+
+  \begin{itemize}
+  \item
+    Construcción del Modelo de clasificación con el paquete \emph{rpart}
+  \item
+    Validación del Modelo de clasificación con el paquete \emph{rpart}
+  \end{itemize}
+\item
+  Clasificación de los clientes con árboles de decisión múltiples
+  (\emph{random forest})
+
+  \begin{itemize}
+  \item
+    Construcción del Modelo de clasificación con el paquete
+    \emph{randomForest}
+  \item
+    Validación del Modelo de clasificación con el paquete
+    \emph{randomForest}
+  \end{itemize}
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Carga de paquetes y del fichero de
+datos}\label{carga-de-paquetes-y-del-fichero-de-datos}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Empezaremos por cargar los packages R que necesitaremos tener en
+memoria. Es importante recordar que las librerías que no se carguen e
+indiquen el error: ``Error in library(''XXXX``) : there is no package
+called `XXXX'\,'', deberán ser instaladas con el comando
+install.packages(``XXXX'')
+
+Cargamos también los datos ubicados en el fichero PEC3.csv
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Cargamos los paquetes necesarios para desarrollar la PEC}
+
+\CommentTok{#   Para representar gráficamente la relación entre variables}
+\KeywordTok{library}\NormalTok{(}\StringTok{"ggplot2"}\NormalTok{)}
+\CommentTok{#   Para clasificar con SVM}
+\KeywordTok{library}\NormalTok{(}\StringTok{'e1071'}\NormalTok{)}
+\CommentTok{#   Para clasificar con K-NN}
+\KeywordTok{library}\NormalTok{(}\StringTok{"class"}\NormalTok{)}
+\CommentTok{#   Para clasificar con rpart}
+\KeywordTok{library}\NormalTok{(}\StringTok{"rpart"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"rpart.plot"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"useful"}\NormalTok{)}
+\CommentTok{#   Para clasificar con randomForest}
+\KeywordTok{library}\NormalTok{(}\StringTok{"randomForest"}\NormalTok{)}
+
+\CommentTok{# Cargamos el fichero de datos que utilizamos para desarrollar la PEC}
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"C:/Users/acamp/OneDrive/Documentos/UOC/proyectos_git/UOC_Fundamentos_Data_Science/B0.477-20191-PEC03"}\NormalTok{)}
+\NormalTok{nombreruta_PEC <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\KeywordTok{getwd}\NormalTok{(),}\StringTok{"/PEC3.csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{Data_PEC <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(nombreruta_PEC, }\DataTypeTok{encoding=}\StringTok{"UTF-8"}\NormalTok{,}
+                      \DataTypeTok{header=}\OtherTok{TRUE}\NormalTok{, }\DataTypeTok{sep=}\StringTok{","}\NormalTok{, }\DataTypeTok{na.strings=}\StringTok{"NA"}\NormalTok{, }\DataTypeTok{dec=}\StringTok{"."}\NormalTok{, }\DataTypeTok{strip.white=}\OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Análisis univariable y bivariable del
+fichero}\label{analisis-univariable-y-bivariable-del-fichero}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+La primera fase del análisis consiste siempre en un análisis descriptivo
+de las variables incluidas en el fichero y de la relación existente
+entre ellas. Para ello, aplicamos la siguiente secuencia de cálculos y
+representaciones gráficas.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Estadísticos descriptivos de las variables
+\item
+  Representación gráfica de cada una de las variables
+\item
+  Estudio de la relación entre las variables cuantitativas
+\item
+  Estudio de la existencia de diferencias por comercial
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 1.Calculamos los descriptivos univariables de las variables del fichero}
+\KeywordTok{summary}\NormalTok{(Data_PEC) }\CommentTok{#Estadísticos descriptivos básicos de las variables}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Ingresos        Margen            Km           Visitas      Comercial
+##  Min.   :4300   Min.   :200.0   Min.   :10.00   Min.   : 1.00   A:50     
+##  1st Qu.:5100   1st Qu.:280.0   1st Qu.:16.00   1st Qu.: 3.00   B:50     
+##  Median :5800   Median :300.0   Median :43.50   Median :13.00   C:50     
+##  Mean   :5843   Mean   :305.4   Mean   :37.59   Mean   :11.99            
+##  3rd Qu.:6400   3rd Qu.:330.0   3rd Qu.:51.00   3rd Qu.:18.00            
+##  Max.   :7900   Max.   :440.0   Max.   :69.00   Max.   :25.00
+\end{verbatim}
+
+Algunos de los estadísticos descriptivos de posición que caracterizan a
+las 5 variables son:
+
+\begin{itemize}
+\item
+  \emph{Importe}: Promedio de 5.843, Máximo 7.900, Mínimo 4.300
+\item
+  \emph{Margen}: Promedio de 305,4, Máximo 440, Mínimo 200
+\item
+  \emph{Km}: Promedio de 37,59, Máximo 69, Mínimo 10
+\item
+  \emph{Visitas}: Promedio de 11,99, Máximo 25, Mínimo 1
+\item
+  \emph{Comercial}: 50 observaciones por comercial
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 2.Representamos gráficamente las variables del fichero mediante histogramas}
+
+\CommentTok{#Histograma Ingresos}
+\NormalTok{f1 <-}\StringTok{ }\KeywordTok{hist}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Ingresos, }\DataTypeTok{main=}\StringTok{"Histograma Ingresos"}\NormalTok{, }\DataTypeTok{col =} \StringTok{"gray"}\NormalTok{, }\DataTypeTok{labels =} \OtherTok{TRUE}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $breaks
+## [1] 4000 4500 5000 5500 6000 6500 7000 7500 8000
+## 
+## $counts
+## [1]  5 27 27 30 31 18  6  6
+## 
+## $density
+## [1] 6.666667e-05 3.600000e-04 3.600000e-04 4.000000e-04 4.133333e-04
+## [6] 2.400000e-04 8.000000e-05 8.000000e-05
+## 
+## $mids
+## [1] 4250 4750 5250 5750 6250 6750 7250 7750
+## 
+## $xname
+## [1] "Data_PEC$Ingresos"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Histograma Margen}
+\NormalTok{f2 <-}\StringTok{ }\KeywordTok{hist}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Margen, }\DataTypeTok{main=}\StringTok{"Histograma Margen"}\NormalTok{, }\DataTypeTok{col =} \StringTok{"gray"}\NormalTok{, }\DataTypeTok{labels =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-3-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $breaks
+##  [1] 200 220 240 260 280 300 320 340 360 380 400 420 440
+## 
+## $counts
+##  [1]  4  7 13 23 36 25 18  9  9  3  2  1
+## 
+## $density
+##  [1] 0.0013333333 0.0023333333 0.0043333333 0.0076666667 0.0120000000
+##  [6] 0.0083333333 0.0060000000 0.0030000000 0.0030000000 0.0010000000
+## [11] 0.0006666667 0.0003333333
+## 
+## $mids
+##  [1] 210 230 250 270 290 310 330 350 370 390 410 430
+## 
+## $xname
+## [1] "Data_PEC$Margen"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Histograma Km}
+\NormalTok{f3 <-}\StringTok{ }\KeywordTok{hist}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Km, }\DataTypeTok{main=}\StringTok{"Histograma Km"}\NormalTok{, }\DataTypeTok{col =} \StringTok{"gray"}\NormalTok{, }\DataTypeTok{labels =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-3-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $breaks
+##  [1] 10 15 20 25 30 35 40 45 50 55 60 65 70
+## 
+## $counts
+##  [1] 37 13  0  1  4 11 21 21 17 16  5  4
+## 
+## $density
+##  [1] 0.049333333 0.017333333 0.000000000 0.001333333 0.005333333
+##  [6] 0.014666667 0.028000000 0.028000000 0.022666667 0.021333333
+## [11] 0.006666667 0.005333333
+## 
+## $mids
+##  [1] 12.5 17.5 22.5 27.5 32.5 37.5 42.5 47.5 52.5 57.5 62.5 67.5
+## 
+## $xname
+## [1] "Data_PEC$Km"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Histograma Visitas}
+\NormalTok{f4 <-}\StringTok{ }\KeywordTok{hist}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Visitas, }\DataTypeTok{main=}\StringTok{"Histograma Visitas"}\NormalTok{, }\DataTypeTok{col =} \StringTok{"gray"}\NormalTok{, }\DataTypeTok{labels =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-3-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f4}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $breaks
+##  [1]  0  2  4  6  8 10 12 14 16 18 20 22 24 26
+## 
+## $counts
+##  [1] 34 14  2  0  7  8 21 16 14 11  9 11  3
+## 
+## $density
+##  [1] 0.113333333 0.046666667 0.006666667 0.000000000 0.023333333
+##  [6] 0.026666667 0.070000000 0.053333333 0.046666667 0.036666667
+## [11] 0.030000000 0.036666667 0.010000000
+## 
+## $mids
+##  [1]  1  3  5  7  9 11 13 15 17 19 21 23 25
+## 
+## $xname
+## [1] "Data_PEC$Visitas"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Histograma Comercial}
+\NormalTok{f5 <-}\StringTok{ }\KeywordTok{plot}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-3-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f5}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1]
+## [1,]  0.7
+## [2,]  1.9
+## [3,]  3.1
+\end{verbatim}
+
+Las variables cuantitativas presentan dos distribuciones diferenciadas:
+
+\begin{itemize}
+\item
+  \emph{Importe} y \emph{Margen} presentan una distribución similar a
+  una campana de \emph{Gauss}, algo más concentrada en el caso de
+  \emph{Margen}
+\item
+  \emph{Km} y \emph{Visitas} presentan una distribución muy similar. Con
+  una alta concentración para valores bajos que desciende rápidamente
+  para volver a crecer siguiendo una campana de \emph{Gauss} a partir
+  del tercer valor de la serie.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 3.Estudiamos la relación existente entre las variables del fichero}
+
+\CommentTok{# Estudiamos la relación entre variables mediante gráficos de dispersión}
+\NormalTok{f6<-}\StringTok{ }\KeywordTok{plot}\NormalTok{(Data_PEC)                                              }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Estudiamos la relación entre variables cuantitativas mediante correlaciones}
+\KeywordTok{cor}\NormalTok{(Data_PEC[,}\KeywordTok{c}\NormalTok{(}\StringTok{"Ingresos"}\NormalTok{,}\StringTok{"Margen"}\NormalTok{,}\StringTok{"Km"}\NormalTok{,}\StringTok{"Visitas"}\NormalTok{)], }\DataTypeTok{use=}\StringTok{"complete"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            Ingresos     Margen         Km    Visitas
+## Ingresos  1.0000000 -0.1093692  0.8717542  0.8179536
+## Margen   -0.1093692  1.0000000 -0.4205161 -0.3565441
+## Km        0.8717542 -0.4205161  1.0000000  0.9627571
+## Visitas   0.8179536 -0.3565441  0.9627571  1.0000000
+\end{verbatim}
+
+Analizando los gráficos de dispersión, apuntamos una fuerte relación
+entre \emph{Visitas}-\emph{Km}, \emph{Ingresos}-\emph{Km},
+\emph{Margen}-\emph{Km} e \emph{Ingresos}-\emph{Visitas} que podemos
+validar con el coeficiente de correlación, estadístico que toma valores
+entre -1 y 1 y que mide la fuerza con la que dos variables quedan
+interrelacionadas (próximo a 1 cuando la relación es fuertemente directa
+y próximo a -1 cuando la relación es fuertemente inversa)
+
+\begin{itemize}
+\item
+  Coeficiente de Correlación \emph{Visitas}-\emph{Km} -\textgreater{}
+  (0,96)
+\item
+  Coeficiente de Correlación \emph{Ingresos}-\emph{Km} -\textgreater{}
+  (0,87)
+\item
+  Coeficiente de Correlación \emph{Ingresos}-\emph{Visitas}
+  -\textgreater{} (0,82)
+\item
+  Coeficiente de Correlación \emph{Margen}-\emph{Km} -\textgreater{}
+  (-0,42)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Estudiamos la relación entre variables Km y Visitas}
+\NormalTok{f7<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Visitas)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{()}
+\NormalTok{f7}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Estudiamos la relación entre variables Km y Visitas con tamañoo ingresos}
+\NormalTok{f8<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Visitas)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{size=}\NormalTok{Ingresos))}
+\NormalTok{f8}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Relación entre variables Km y Visitas con tamaño margen}
+\NormalTok{f9<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Visitas)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{size=}\NormalTok{Margen))}
+\NormalTok{f9}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-5-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Relación entre variables Km y Margen con tamaño ingresos}
+\NormalTok{fA<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Margen)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{size=}\NormalTok{Ingresos))}
+\NormalTok{fA}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-5-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 3.Estudiamos la existencia de diferencias por Comercial}
+
+\CommentTok{# promedio variables por comercial }
+\KeywordTok{tapply}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Ingresos,Data_PEC}\OperatorTok{$}\NormalTok{Comercial,mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    A    B    C 
+## 5006 5936 6588
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{tapply}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Margen,Data_PEC}\OperatorTok{$}\NormalTok{Comercial,mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     A     B     C 
+## 341.8 277.0 297.4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{tapply}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Km,Data_PEC}\OperatorTok{$}\NormalTok{Comercial,mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     A     B     C 
+## 14.64 42.60 55.52
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{tapply}\NormalTok{(Data_PEC}\OperatorTok{$}\NormalTok{Visitas,Data_PEC}\OperatorTok{$}\NormalTok{Comercial,mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     A     B     C 
+##  2.44 13.26 20.26
+\end{verbatim}
+
+Vemos que existen diferencias remarcables en el promedio de cada una de
+las variables para cada Comercial:
+
+\begin{itemize}
+\item
+  El Comercial C es el Comercial con un \emph{Importe} promedio mayor,
+  con una valor ligeramente superior al de B\\
+\item
+  El Comercial A es el Comercial con un \emph{Margen} promedio mayor
+\item
+  El Comercial C es el Comercial que hace más \emph{Visitas} en promedio
+\item
+  El Comercial C es el Comercial que hace más \emph{Km} en promedio, con
+  un valor que es prácticamente el doble que el del B
+\end{itemize}
+
+Graficamos a continuación las variables cuantitativas diferenciando por
+Comercial.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Relación entre variables Km y Visitas con tamaño ingresos y Color según Comercial}
+\NormalTok{f10<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Visitas, }\DataTypeTok{color=}\NormalTok{Comercial)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{size=}\NormalTok{Ingresos))}
+\NormalTok{f10}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Relación entre variables Km y Visitas con tamaño ingresos y Color según Comercial, línea tendencia y elipse}
+\NormalTok{f11<-}\KeywordTok{ggplot}\NormalTok{(Data_PEC, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Visitas, }\DataTypeTok{color=}\NormalTok{Comercial)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{size=}\NormalTok{Ingresos)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method=}\NormalTok{lm, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{fill=}\NormalTok{Comercial))}\OperatorTok{+}\StringTok{ }\KeywordTok{stat_ellipse}\NormalTok{(}\DataTypeTok{type =} \StringTok{"norm"}\NormalTok{)}
+\NormalTok{f11}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-6-2.pdf}
+
+Identificamos un comportamiento diferenciado donde \emph{Km} y
+\emph{Visitas} ya que son las variables que presentan una mayor
+capacidad de diferenciación.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Preparación de los conjuntos de entrenamiento y
+validación}\label{preparacion-de-los-conjuntos-de-entrenamiento-y-validacion}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Construimos un \textbf{juego de datos de entrenamiento} con el 70\% de
+registros para construir los modelos y un \textbf{juego de datos de
+pruebas o validación} con el 30\% de registros restantes para validar
+los modelos. Esta separación de ambos conjuntos es aleatoria.
+
+Separamos los datos en entrenamiento y validación antes de proceder con
+el resto de ejercicios para asegurar que los datos de entrenamiento y
+validación son iguales en todos los casos y los resultados son
+comparables. Si lo hiciésemos de otro modo, las diferencias en la
+calidad de los modelos podrían ser debidas a una separación distinta
+entre los conjuntos de entrenamiento y validación.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Dividimos el fichero en 70% entreno y 30% validación  #}
+\KeywordTok{RNGversion}\NormalTok{(}\StringTok{'3.5.3'}\NormalTok{) }\CommentTok{# fijaremos el criterio de generación de números aleatorios para que todos obtengamos los mismos resultados }
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)  }\CommentTok{# Seed inicializa el generador de números aleatorios que usaremos para separar los datos en train y test. Usando un seed fijo, nos aseguramos de que todos generamos los mismos conjuntos y los resultados son reproducibles}
+\NormalTok{ind <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{2}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(Data_PEC), }\DataTypeTok{replace=}\OtherTok{TRUE}\NormalTok{, }\DataTypeTok{prob=}\KeywordTok{c}\NormalTok{(}\FloatTok{0.7}\NormalTok{, }\FloatTok{0.3}\NormalTok{))}
+\NormalTok{trainData <-}\StringTok{ }\NormalTok{Data_PEC[ind}\OperatorTok{==}\DecValTok{1}\NormalTok{,]}
+\NormalTok{testData <-}\StringTok{ }\NormalTok{Data_PEC[ind}\OperatorTok{==}\DecValTok{2}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Proceso de clasificación mediante
+SVM.}\label{proceso-de-clasificacion-mediante-svm.}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\textbf{Aplicamos el modelo SVM}, pasándole como parámetros la matriz de
+entrenamiento compuesta por las 4 variables cuantitativas :
+\emph{Importe}, \emph{Margen}, \emph{Km} y \emph{Visitas}. No le pasamos
+el campo \emph{Comercial} porque precisamente es el campo que el
+algoritmo debe predecir.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Entrenamos el modelo SVM}
+\NormalTok{model_svm =}\StringTok{ }\KeywordTok{svm}\NormalTok{(trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], trainData}\OperatorTok{$}\NormalTok{Comercial)}
+\CommentTok{# Usamos el modelo que hemos entrenado para generar una predicción para cada muestra del conjunto de validación }
+\NormalTok{preds_svm =}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_svm, testData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{])}
+\CommentTok{# Calculamos el % de aciertos de nuestro modelo}
+\KeywordTok{sum}\NormalTok{(preds_svm }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 94.73684
+\end{verbatim}
+
+Evaluamos el \% de acierto del modelo SVM que hemos entrenado.
+
+SVM genera un 94.73\% de acierto sobre los datos propuestos.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Proceso de clasificación mediante Árboles de decisión
+simples}\label{proceso-de-clasificacion-mediante-arboles-de-decision-simples}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Para construir un árbol de decisión es necesario definir una función que
+relaciona una variable categórica dependiente (factor) con \emph{n}
+variables independientes que pueden ser categóricas o numéricas. En
+nuestro caso trabajaremos con:
+
+\begin{itemize}
+\item
+  1 variable factor dependiente -\textgreater{} \emph{Comercial}
+\item
+  4 variables independientes -\textgreater{} \emph{Ingresos},
+  \emph{Margen}, \emph{Km} y \emph{Visitas}
+\end{itemize}
+
+El algoritmo de clasificación busca cuál es la variable que permite
+obtener una submuestra más diferenciada para la variable dependiente
+(\emph{Comercial} en nuestro caso) e identifica también qué intervalos
+(si la variable es cuantitativa) ó agrupación de categorías de la/s
+variable/s independiente/s permitiría/n maximizar dicha división.
+
+Una vez identificada la variable independiente que permite obtener la
+clasificación con una mayor capacidad de diferenciación, el proceso se
+repite reiterativamente en cada uno de los nodos obtenidos hasta que el
+algoritmo no encuentra diferencias significativas que le permitan seguir
+profundizando en los nodos.
+
+Una vez obtenido una primera versión del árbol, existen algoritmos que
+permiten hacer un podado del árbol (\emph{prunning}), eliminando
+aquellas ramas que no acaban de justificar su presencia de acuerdo con
+algunos parámetros preestablecidos.
+
+En todos los casos seguiremos la siguiente secuencia de pasos para
+obtener los Árboles de clasificación:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Definir la función que relaciona la variable dependiente con las
+  variables independientes
+\item
+  Estimar el árbol de decisión
+\item
+  Representar gráficamente una primera versión del árbol
+\end{enumerate}
+
+\begin{itemize}
+\item
+  Estudiar la aplicación práctica del resultado obtenido
+\item
+  Podar el árbol (si el algoritmo admite podado)
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Estudiar la capacidad predictiva del árbol
+\end{enumerate}
+
+Estudiamos a continuación la capacidad predictiva del Árbol de decisión
+simple obtenido mediante el paquete \emph{rpart}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Declaramos función del árbol}
+\NormalTok{ArbolRpart =}\StringTok{ }\NormalTok{Comercial }\OperatorTok{~}\StringTok{ }\NormalTok{Ingresos }\OperatorTok{+}\StringTok{ }\NormalTok{Margen }\OperatorTok{+}\StringTok{ }\NormalTok{Km }\OperatorTok{+}\StringTok{ }\NormalTok{Visitas}
+\CommentTok{# Aplicamos algoritmo}
+\NormalTok{model_tree =}\StringTok{ }\KeywordTok{rpart}\NormalTok{(ArbolRpart, }\DataTypeTok{method=}\StringTok{"class"}\NormalTok{, }\DataTypeTok{data=}\NormalTok{trainData)}
+\CommentTok{# Validamos la capacidad de predicción del árbol con el fichero de validación}
+\NormalTok{preds_tree <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_tree, }\DataTypeTok{newdata =}\NormalTok{ testData, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+\CommentTok{# Visualizamos una matriz de confusión}
+\KeywordTok{table}\NormalTok{(preds_tree, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           
+## preds_tree  A  B  C
+##          A 10  0  0
+##          B  0 12  2
+##          C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Calculamos el % de aciertos }
+\KeywordTok{sum}\NormalTok{(preds_tree }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 94.73684
+\end{verbatim}
+
+El árbol de decisión obtenido mediante el paquete \emph{rpart} clasifica
+correctamente un 94,73\% de los registros. Un resultado bastante alto y
+aceptable.
+
+Una vez construida una primera versión del árbol, estudiamos la
+viabilidad de un podado de árbol.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Podado del árbol}
+\NormalTok{pruned_tree_model <-}\StringTok{ }\KeywordTok{prune}\NormalTok{(model_tree, }\DataTypeTok{cp=}\NormalTok{ model_tree}\OperatorTok{$}\NormalTok{cptable[}\KeywordTok{which.min}\NormalTok{(model_tree}\OperatorTok{$}\NormalTok{cptable[,}\StringTok{"xerror"}\NormalTok{]),}\StringTok{"CP"}\NormalTok{])}
+\NormalTok{pruned_tree_model <-}\StringTok{ }\KeywordTok{prune}\NormalTok{(pruned_tree_model, }\DataTypeTok{cp=} \FloatTok{0.02}\NormalTok{)}
+\CommentTok{# Representación del árbol podado}
+\NormalTok{f14<-}\KeywordTok{rpart.plot}\NormalTok{(pruned_tree_model,}\DataTypeTok{extra=}\DecValTok{4}\NormalTok{) }\CommentTok{#visualizamos el árbol}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f14}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $obj
+## n= 112 
+## 
+## node), split, n, loss, yval, (yprob)
+##       * denotes terminal node
+## 
+## 1) root 112 72 A (0.3571429 0.3392857 0.3035714)  
+##   2) Km< 24.5 40  0 A (1.0000000 0.0000000 0.0000000) *
+##   3) Km>=24.5 72 34 B (0.0000000 0.5277778 0.4722222)  
+##     6) Visitas< 17.5 40  3 B (0.0000000 0.9250000 0.0750000) *
+##     7) Visitas>=17.5 32  1 C (0.0000000 0.0312500 0.9687500) *
+## 
+## $snipped.nodes
+## NULL
+## 
+## $xlim
+## [1] 0 1
+## 
+## $ylim
+## [1] -0.1  1.1
+## 
+## $x
+## [1] 0.3988121 0.0849497 0.7126746 0.5034329 0.9219162
+## 
+## $y
+## [1] 0.92746142 0.03747078 0.52292022 0.03747078 0.03747078
+## 
+## $branch.x
+##        [,1]      [,2]      [,3]      [,4]      [,5]
+## x 0.3988121 0.0849497 0.7126746 0.5034329 0.9219162
+##          NA 0.0849497 0.7126746 0.5034329 0.9219162
+##          NA 0.3988121 0.3988121 0.7126746 0.7126746
+## 
+## $branch.y
+##       [,1]      [,2]      [,3]      [,4]      [,5]
+## y 1.015811 0.1258200 0.6112695 0.1258200 0.1258200
+##         NA 0.8291129 0.8291129 0.4245717 0.4245717
+##         NA 0.8291129 0.8291129 0.4245717 0.4245717
+## 
+## $labs
+## [1] "A\n.36  .34  .30"  "A\n1.00  .00  .00" "B\n.00  .53  .47" 
+## [4] "B\n.00  .92  .07"  "C\n.00  .03  .97" 
+## 
+## $cex
+## [1] 1
+## 
+## $boxes
+## $boxes$x1
+## [1]  0.30859081 -0.01347489  0.62245324  0.41321162  0.83169486
+## 
+## $boxes$y1
+## [1]  0.87693849 -0.01305215  0.47239729 -0.01305215 -0.01305215
+## 
+## $boxes$x2
+## [1] 0.4890334 0.1833743 0.8028959 0.5936542 1.0121375
+## 
+## $boxes$y2
+## [1] 1.0158107 0.1258200 0.6112695 0.1258200 0.1258200
+## 
+## 
+## $split.labs
+## [1] ""
+## 
+## $split.cex
+## [1] 1 1 1 1 1
+## 
+## $split.box
+## $split.box$x1
+## [1] 0.3295269        NA 0.6195909        NA        NA
+## 
+## $split.box$y1
+## [1] 0.7912866        NA 0.3867454        NA        NA
+## 
+## $split.box$x2
+## [1] 0.4680974        NA 0.8057582        NA        NA
+## 
+## $split.box$y2
+## [1] 0.8669393        NA 0.4623981        NA        NA
+\end{verbatim}
+
+Dado que el árbol original es muy simple. El podado no devuelve ninguna
+versión nueva reducida.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Proceso de clasificación mediante árboles de decisión múltiples
+(paquete
+randomForest)}\label{proceso-de-clasificacion-mediante-arboles-de-decision-multiples-paquete-randomforest}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Una vez evaluada la capacidad predictiva del algoritmo \emph{SVM}, y los
+árboles de decisión simples obtenidos mediante el paquete \emph{rpart},
+estimamos el modelo que obtendríamos si ejecutásemos \emph{n} árboles de
+decisión simultáneamente (para \emph{n}=100 en nuestro caso) mediante el
+algoritmo \emph{randomForest}.
+
+El algoritmo \emph{randomForest} es un método de estimación combinado,
+donde el resultado de la estimación se construye a partir de los
+resultados obtenidos mediante el cálculo de \emph{n} árboles donde los
+predictores son incluidos al azar.
+
+Es un método complejo con ventajas e inconvenientes respecto a los
+árboles de clasificación simples:
+
+\emph{Ventajas}
+
+\begin{itemize}
+\item
+  Es uno de los algoritmos de aprendizaje más precisos
+\item
+  Se ejecuta eficientemente en grandes bases de datos
+\item
+  Permite trabajar con cientos de variables independientes sin excluir
+  ninguna
+\item
+  Determina la importancia en la clasificación de cada variable
+\item
+  Recupera eficazmente los valores perdidos de un dataset
+  (\emph{missings})
+\item
+  Permite evaluar la ganancia en clasificación obtenida a medida que
+  incrementamos el número de árboles generados en el modelo.
+\end{itemize}
+
+\emph{Inconvenientes}
+
+\begin{itemize}
+\item
+  A diferencia de los árboles de decisión, la clasificación hecha por
+  \emph{random forests} es difícil de interpretar
+\item
+  Favorece las variables categóricas que tienen un mayor número de
+  niveles por encima de aquéllas que tienen un número de categoría más
+  reducido. Comprometiendo la fiabilidad del modelo para este tipo de
+  datos.
+\item
+  Favorece los grupos más pequeños cuando las variables están
+  correlacionadas
+\item
+  randomForest sobreajusta en ciertos grupos de datos con tareas de
+  clasificación/regresión ruidosas
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\CommentTok{#Declaramos función del árbol}
+\NormalTok{ArbolRF <-}\StringTok{ }\NormalTok{Comercial }\OperatorTok{~}\StringTok{ }\NormalTok{Ingresos }\OperatorTok{+}\StringTok{ }\NormalTok{Margen }\OperatorTok{+}\StringTok{ }\NormalTok{Km }\OperatorTok{+}\StringTok{ }\NormalTok{Visitas}
+\CommentTok{#Aplicamos algoritmo}
+\NormalTok{model_random_forest <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(ArbolRF, }\DataTypeTok{data=}\NormalTok{trainData, }\DataTypeTok{ntree=}\DecValTok{500}\NormalTok{,}\DataTypeTok{proximity=}\NormalTok{T,}\DataTypeTok{nodesize=}\DecValTok{5}\NormalTok{) }\CommentTok{#indicamos el número de árboles mediante ntree=500}
+\CommentTok{#Obtenemos la importancia de cada variable en el proceso de clasificación}
+\KeywordTok{importance}\NormalTok{(model_random_forest)      }\CommentTok{#Importancia de las variables en formato text}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          MeanDecreaseGini
+## Ingresos        6.7638264
+## Margen          0.9610651
+## Km             30.6510276
+## Visitas        32.9783037
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f15<-}\KeywordTok{varImpPlot}\NormalTok{(model_random_forest) }\CommentTok{#Importancia de las variables en formato gráfico}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{f15}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          MeanDecreaseGini
+## Ingresos        6.7638264
+## Margen          0.9610651
+## Km             30.6510276
+## Visitas        32.9783037
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#evolución del error según el número de árboles}
+\NormalTok{f16<-}\KeywordTok{plot}\NormalTok{(model_random_forest, }\DataTypeTok{main =} \StringTok{""}\NormalTok{)  }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-11-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(f16)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             OOB A          B          C
+## [1,] 0.10526316 0 0.36363636 0.00000000
+## [2,] 0.08695652 0 0.21739130 0.04347826
+## [3,] 0.09411765 0 0.19354839 0.08000000
+## [4,] 0.07368421 0 0.18750000 0.03333333
+## [5,] 0.07000000 0 0.14705882 0.06451613
+## [6,] 0.05660377 0 0.08333333 0.09375000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Validamos la capacidad de predicción del árbol con el fichero de validación}
+\NormalTok{preds_random_forest <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_random_forest, }\DataTypeTok{newdata =}\NormalTok{ testData)}
+\KeywordTok{table}\NormalTok{(preds_random_forest, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                    
+## preds_random_forest  A  B  C
+##                   A 10  0  0
+##                   B  0 12  1
+##                   C  0  0 15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Calculamos el % de aciertos }
+\KeywordTok{sum}\NormalTok{(preds_random_forest }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 97.36842
+\end{verbatim}
+
+El árbol de decisión obtenido mediante el paquete \emph{randomForest}
+clasifica correctamente un 97,36\% de los registros. Un resultado
+bastante alto y aceptable.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Ejercicios}\label{ejercicios}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Pregunta 1}\label{pregunta-1}
+
+Al inicio de la práctica hemos separado el conjunto de datos en
+entrenamiento y validación y hemos entrenado el modelo usando sólo el
+conjunto de entrenamiento. A continuación, hemos comprobado si el modelo
+había aprendido mediante el conjunto de validación. Explicad por qué es
+importante separar los datos en dos conjuntos sin solapamiento. ¿Qué
+sucedería si usamos todo el conjunto de datos para entrenar y no
+apartamos unas muestras para validar?
+
+Ilustrad vuestra explicación empíricamente. Usad el modelo
+`model\_random\_forest' que hemos entrenado durante la práctica y
+utilizadlo para generar predicciones sobre los datos de entrenamiento. A
+continuación, haced lo mismo usando el conjunto de validación. Puede
+usar el siguiente código de muestra para generar las predicciones
+propuestas. Calcule el índice de aciertos en cada caso y justifique el
+resultado.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Vamos a utilizar el modelo entrenado previamente (model_random_forest)}
+\NormalTok{## Generamos predicciones sobre los datos de train}
+\NormalTok{predicions_on_train_rf =}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_random_forest, trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], }\DataTypeTok{type =} \StringTok{'class'}\NormalTok{)}
+\NormalTok{## Generamos predicciones sobre los datos de validación}
+\NormalTok{predicions_on_test_rf  =}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_random_forest,  testData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], }\DataTypeTok{type =} \StringTok{'class'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Respuesta 1}\label{respuesta-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Escriba su código aquí}
+\KeywordTok{sum}\NormalTok{(predicions_on_train_rf }\OperatorTok{==}\StringTok{ }\NormalTok{trainData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(trainData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 98.21429
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(predicions_on_test_rf }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 97.36842
+\end{verbatim}
+
+En el caso de la predicción con datos de entrenamiento, en general el
+modelo es mucho más preciso ya que se estan usando los mismos datos con
+los que se ha creado el modelo. Este se entiende como que el modelo esta
+sobreentrenado (para los datos que se estan usando para la validación)
+lo que conlleva a un ejemplo de overfitting
+(\url{https://en.wikipedia.org/wiki/Overfitting})
+
+Se debe usar los datos de test para validar que el algoritmo
+``funcionara'' para todos los posibles datos que existen.
+
+\subsection{Pregunta 2}\label{pregunta-2}
+
+En el apartado Proceso de clasificación mediante Árboles de decisión
+simples se ha construido un modelo utilizando como variables
+independientes las variables Ingresos, Margen, Km y Visitas.
+
+Construya un nuevo modelo llamado model\_tree2 teniendo en cuenta las
+variables Ingresos y Margen. Calcula el \% de aciertos del nuevo modelo
+y represente graficamente el árbol de decisión contruido.
+
+Comente los resultados obtenidos
+
+\subsubsection{Respuesta 2}\label{respuesta-2}
+
+Primero calculamos el porcentaje de acierto del modelo anterior para
+poder comparar:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_tree, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           
+## preds_tree  A  B  C
+##          A 10  0  0
+##          B  0 12  2
+##          C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(preds_tree }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 94.73684
+\end{verbatim}
+
+Ahora calcularemos el model\_tree2:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Declaramos función del árbol}
+\NormalTok{ArbolRpart2 =}\StringTok{ }\NormalTok{Comercial }\OperatorTok{~}\StringTok{ }\NormalTok{Ingresos }\OperatorTok{+}\StringTok{ }\NormalTok{Margen}
+\CommentTok{# Aplicamos algoritmo}
+\NormalTok{model_tree2 =}\StringTok{ }\KeywordTok{rpart}\NormalTok{(ArbolRpart2, }\DataTypeTok{method=}\StringTok{"class"}\NormalTok{, }\DataTypeTok{data=}\NormalTok{trainData)}
+\CommentTok{# Validamos la capacidad de predicción del árbol con el fichero de validación}
+\NormalTok{preds_tree2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_tree2, }\DataTypeTok{newdata =}\NormalTok{ testData, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+\CommentTok{# Visualizamos una matriz de confusión}
+\KeywordTok{table}\NormalTok{(preds_tree2, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            
+## preds_tree2  A  B  C
+##           A 10  4  2
+##           B  0  5  9
+##           C  0  3  5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Calculamos el % de aciertos }
+\KeywordTok{sum}\NormalTok{(preds_tree2 }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 52.63158
+\end{verbatim}
+
+El porcentaje de aciertos ha descendido drasticamente. Esto es debido a
+que una parte crucial de la información ha quedado fuera del modelo.
+
+Es normal que si modelamos ``la realidad'' solo con parte de la
+información no consigamos crear modelos precisos.
+
+Mostramos el arbol:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{rpart.plot}\NormalTok{(model_tree2,}\DataTypeTok{extra=}\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+Mostramos el arbol podado:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Podado del árbol}
+\NormalTok{pruned_tree_model2 <-}\StringTok{ }\KeywordTok{prune}\NormalTok{(model_tree2, }\DataTypeTok{cp=}\NormalTok{ model_tree2}\OperatorTok{$}\NormalTok{cptable[}\KeywordTok{which.min}\NormalTok{(model_tree2}\OperatorTok{$}\NormalTok{cptable[,}\StringTok{"xerror"}\NormalTok{]),}\StringTok{"CP"}\NormalTok{])}
+\NormalTok{pruned_tree_model2 <-}\StringTok{ }\KeywordTok{prune}\NormalTok{(pruned_tree_model2, }\DataTypeTok{cp=} \FloatTok{0.02}\NormalTok{)}
+\CommentTok{# Representación del árbol podado}
+\KeywordTok{rpart.plot}\NormalTok{(pruned_tree_model2,}\DataTypeTok{extra=}\DecValTok{4}\NormalTok{) }\CommentTok{#visualizamos el árbol}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\subsection{Pregunta 3}\label{pregunta-3}
+
+Explique con sus palabras en qué consiste el algoritmo SVM y qué
+importancia tiene el Kernel utilizado. Teniendo ésto en cuenta,
+¿normalizar los datos mejora la clasificación? Ilustre su respuesta con
+un ejemplo.
+
+Entrene y testee un svm normalizando y sin normalizar los datos. Tenga
+en cuenta que `svm' acepta un parámetro que indica si los datos deben
+ser o no normalizados tal como muestra el siguiente ejemplo:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{example_trained_model =}\StringTok{ }\KeywordTok{svm}\NormalTok{(trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], trainData}\OperatorTok{$}\NormalTok{Comercial, }\DataTypeTok{scale =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Respuesta 3}\label{respuesta-3}
+
+Los SVM contruye un hiperplano (o conjunto de hiperplanos) que permiten
+separa los datos (y por tanto, los permite clasificar). Las funciones de
+kernel son las que nos definen la distancia y como sera ese hiperplano.
+En función del kernel usado podremos predecir mejor o peor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+\NormalTok{model_svm_norm =}\StringTok{ }\KeywordTok{svm}\NormalTok{(trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], trainData}\OperatorTok{$}\NormalTok{Comercial, }\DataTypeTok{scale =} \OtherTok{TRUE}\NormalTok{)}
+\CommentTok{# Usamos el modelo que hemos entrenado para generar una predicción para cada muestra del conjunto de validación }
+\NormalTok{preds_svm_norm =}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_svm_norm, testData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{])}
+\CommentTok{# Calculamos el % de aciertos de nuestro modelo}
+\KeywordTok{sum}\NormalTok{(preds_svm_norm }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 94.73684
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+\NormalTok{model_svm_no =}\StringTok{ }\KeywordTok{svm}\NormalTok{(trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], trainData}\OperatorTok{$}\NormalTok{Comercial, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
+\CommentTok{# Usamos el modelo que hemos entrenado para generar una predicción para cada muestra del conjunto de validación}
+\NormalTok{preds_svm_no =}\StringTok{ }\KeywordTok{predict}\NormalTok{(model_svm_no, testData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{])}
+\CommentTok{# Calculamos el % de aciertos de nuestro modelo}
+\KeywordTok{sum}\NormalTok{(preds_svm_no }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 31.57895
+\end{verbatim}
+
+\subsection{Pregunta 4}\label{pregunta-4}
+
+Durante la PEC, se han construido diferentes modelos: model\_svm,
+model\_tree y model\_random\_forest que han obtenido unos resultados de
+acierto parecidos. ¿Han aprendido lo mismo?
+
+Comparar los modelos dos a dos (3 comparaciones) para identificar si hay
+diferencias en la clasificación de los elementos del conjunto de datos
+testData
+
+\subsection{Respuesta 4}\label{respuesta-4}
+
+Primero comparamos SVM con el arbol de decisión:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_svm, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          
+## preds_svm  A  B  C
+##         A 10  0  0
+##         B  0 12  2
+##         C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_tree, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           
+## preds_tree  A  B  C
+##          A 10  0  0
+##          B  0 12  2
+##          C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_svm, preds_tree)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          preds_tree
+## preds_svm  A  B  C
+##         A 10  0  0
+##         B  0 14  0
+##         C  0  0 14
+\end{verbatim}
+
+Como podemos ver los dos modelos classifican de la misma forma.
+
+Ahora compararemos SVM con random forest:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_svm, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          
+## preds_svm  A  B  C
+##         A 10  0  0
+##         B  0 12  2
+##         C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_random_forest, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                    
+## preds_random_forest  A  B  C
+##                   A 10  0  0
+##                   B  0 12  1
+##                   C  0  0 15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_svm, preds_random_forest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          preds_random_forest
+## preds_svm  A  B  C
+##         A 10  0  0
+##         B  0 13  1
+##         C  0  0 14
+\end{verbatim}
+
+En este este caso vemos que difieren. En concreto 1 elemento que SVM
+predice como commercial B, en random forest se predice com C.
+
+Por ultimo, compararemos arbol de decisión con random forest (deberia
+ser igual a la comparación anterior ya que SVM y arbol de decisión
+clasifican igual):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_tree, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           
+## preds_tree  A  B  C
+##          A 10  0  0
+##          B  0 12  2
+##          C  0  0 14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_random_forest, testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                    
+## preds_random_forest  A  B  C
+##                   A 10  0  0
+##                   B  0 12  1
+##                   C  0  0 15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_tree, preds_random_forest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           preds_random_forest
+## preds_tree  A  B  C
+##          A 10  0  0
+##          B  0 13  1
+##          C  0  0 14
+\end{verbatim}
+
+Como podemos ver, obtenemos el mismo resultado que en la comparación
+anterior.
+
+\subsection{Pregunta 5}\label{pregunta-5}
+
+En el gráfico f10 mostramos la relación entre las variables Visitas, KM
+e Ingresos diferenciando por colores entre las categorías. Realice 2
+gráficos similares que muestren las variables Km y Margen utilizando el
+dataset de validación testData. En el primer gráfico se tienen que
+colorear los elementos con su categoría real, en el segundo se tienen
+que colorear con la prediccion realizada utilizando el modelo model\_svm
+entrenado anteriormente. En ambos gráficos se tiene que mostrar si las
+predicciones son correctas o no utilizando formas distintas para los
+aciertos y para los fallos.
+
+\subsection{Respuesta 5}\label{respuesta-5}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{grp <-}\StringTok{ }\NormalTok{(preds_svm }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot51 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(testData, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Margen, }\DataTypeTok{color=}\NormalTok{Comercial)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{shape=}\KeywordTok{factor}\NormalTok{(grp), }\DataTypeTok{size=}\DecValTok{1}\NormalTok{))}
+\NormalTok{plot51}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot52 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(testData, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Km, }\DataTypeTok{y=}\NormalTok{Margen, }\DataTypeTok{color=}\NormalTok{preds_svm)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{shape=}\KeywordTok{factor}\NormalTok{(grp), }\DataTypeTok{size=}\DecValTok{1}\NormalTok{))}
+\NormalTok{plot52}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{B0.477-20191-PEC3-Algoritmos-de-Clasificacion-Enunciado_files/figure-latex/unnamed-chunk-25-1.pdf}
+
+\subsection{Pregunta 6}\label{pregunta-6}
+
+Calcula una predicción de clasificación utilizando el algoritmo KNN con
+k=3. Compare los resultados con los obtenidos utilizando el modelo
+model\_svm. Para poder reproducir los resultados, utilice la semilla
+1234 antes de entrenar el modelo knn. Nombrar `preds\_knn' a la variable
+que contiene las predicciones del modelo knn para poder utilizarlo en el
+ejercicio siguiente.
+
+\subsection{Respuesta 6}\label{respuesta-6}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+
+\NormalTok{preds_knn <-}\StringTok{ }\KeywordTok{knn}\NormalTok{(trainData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{],testData[,}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], trainData}\OperatorTok{$}\NormalTok{Comercial , }\DataTypeTok{k =} \DecValTok{3}\NormalTok{)}
+
+\NormalTok{conf.mat <-}\StringTok{ }\KeywordTok{table}\NormalTok{(}\StringTok{"Predicción" = preds_knn,"}\NormalTok{Real}\StringTok{" = testData$Comercial)}
+
+\StringTok{conf.mat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           Real
+## Predicción  A  B  C
+##          A 10  2  0
+##          B  0  7  8
+##          C  0  3  8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(preds_knn, preds_svm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          preds_svm
+## preds_knn  A  B  C
+##         A 10  2  0
+##         B  0  9  6
+##         C  0  3  8
+\end{verbatim}
+
+\subsection{Pregunta 7}\label{pregunta-7}
+
+Es habitual combinar los resultados de distintos modelos para reforzar
+sus respectivas predicciones. Este procedimiento se denomina
+habitualmente ``ensamblado''. Construya un modelo ensamblando los
+modelos vistos durante la práctica: SVM, el randomForest y el modelo knn
+entrenado en el ejercicio anterior. ¿Mejora el ensemble las métricas
+obtenidas por los modelos ensamblados?
+
+Para hacerlo, construya un modelo ensamblado, es decir, para cada
+registro, cada modelo realiza una predicción para la categoría. El
+modelo ensamblado debe asignar a cada registro la categoría más repetida
+de las tres. Calcule el acierto del modelo resultante. Tome la variable
+`models\_to\_ensemble' como entrada.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{models_to_ensemble <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(preds_svm, preds_random_forest, preds_knn)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Respuesta 7}\label{respuesta-7}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Modes <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  ux <-}\StringTok{ }\KeywordTok{unique}\NormalTok{(x)}
+\NormalTok{  tab <-}\StringTok{ }\KeywordTok{tabulate}\NormalTok{(}\KeywordTok{match}\NormalTok{(x, ux))}
+\NormalTok{  ux[tab }\OperatorTok{==}\StringTok{ }\KeywordTok{max}\NormalTok{(tab)]}
+\NormalTok{\}}
+
+\NormalTok{total <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(models_to_ensemble, }\DecValTok{1}\NormalTok{, Modes)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(total }\OperatorTok{==}\StringTok{ }\NormalTok{testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(testData}\OperatorTok{$}\NormalTok{Comercial)}\OperatorTok{*}\DecValTok{100}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 94.73684
+\end{verbatim}
+
+En este caso el error es de 94,74\%. Esta tecnica suele usarse para
+mejorar la predicción usando varios modelos distintos
+(\url{https://en.wikipedia.org/wiki/Ensemble_learning})
+
+\subsection{Pregunta 8}\label{pregunta-8}
+
+Explique como mínimo una forma alternativa de generar un ensemble
+(busque en internet distintas alternativas si le resulta necesario).
+
+\subsection{Respuesta 8}\label{respuesta-8}
+
+El caso de antes era un modelo ensemble por votacion mayoritaria. Otras
+formas alternativas las podemos encontrar en boosting o bootstrap:
+
+\begin{itemize}
+\tightlist
+\item
+  Boosting: se combinan distintos modelos ``debiles'' para crear un
+  modelo robusto. Lo que se hace es associarle pesos en función de la
+  exactitud de sus predicciones.
+  (\url{https://en.wikipedia.org/wiki/Boosting_(machine_learning)})
+\end{itemize}
+
+-Bootstrap: se generan un numero elevado de muestras a partir de la
+muestra inicial, lo que nos permiten usar muchos mas modelos.
+(\url{https://en.wikipedia.org/wiki/Bootstrap_aggregating})
+
+
+\end{document}

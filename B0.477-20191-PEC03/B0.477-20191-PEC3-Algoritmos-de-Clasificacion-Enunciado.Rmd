@@ -3,6 +3,9 @@ title: 'Algoritmos de clasificación: SVM, Árboles de decisión simples y múlt
 author: "UOC - Master BI - Business Analytics (Albert Campano)"
 date: "Diciembre del 2019"
 output:
+  pdf_document:
+    highlight: zenburn
+    toc: yes
   html_document:
     highlight: default
     number_sections: yes
@@ -11,9 +14,6 @@ output:
     toc_depth: 2
     includes:
       in_header: B0.477-PEC-header.html
-  pdf_document:
-    highlight: zenburn
-    toc: yes
   word_document: default
 editor_options: 
   chunk_output_type: console
@@ -570,11 +570,24 @@ example_trained_model = svm(trainData[,1:4], trainData$Comercial, scale = TRUE)
 
 ## Respuesta 3
 
-Escriba su respuesta aquí
+Los SVM contruye un hiperplano (o conjunto de hiperplanos) que permiten separa los datos (y por tanto, los permite clasificar). Las funciones de kernel son las que nos definen la distancia y como sera ese hiperplano. En función del kernel usado podremos predecir mejor o peor.
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+set.seed(1234)
+model_svm_norm = svm(trainData[,1:4], trainData$Comercial, scale = TRUE)
+# Usamos el modelo que hemos entrenado para generar una predicción para cada muestra del conjunto de validación 
+preds_svm_norm = predict(model_svm_norm, testData[,1:4])
+# Calculamos el % de aciertos de nuestro modelo
+sum(preds_svm_norm == testData$Comercial)/ length(testData$Comercial)*100
+
+set.seed(1234)
+model_svm_no = svm(trainData[,1:4], trainData$Comercial, scale = FALSE)
+# Usamos el modelo que hemos entrenado para generar una predicción para cada muestra del conjunto de validación
+preds_svm_no = predict(model_svm_no, testData[,1:4])
+# Calculamos el % de aciertos de nuestro modelo
+sum(preds_svm_no == testData$Comercial)/ length(testData$Comercial)*100
 ```
+
 
 ## Pregunta 4
 
@@ -639,11 +652,17 @@ Calcula una predicción de clasificación utilizando el algoritmo KNN con k=3. C
 
 ## Respuesta 6
 
-Escriba su respuesta aquí
-
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+set.seed(1234)
+
+preds_knn <- knn(trainData[,1:4],testData[,1:4], trainData$Comercial , k = 3)
+
+conf.mat <- table("Predicción" = preds_knn,"Real" = testData$Comercial)
+
+conf.mat
+table(preds_knn, preds_svm)
 ```
+
 
 ## Pregunta 7
 
@@ -652,16 +671,27 @@ Es habitual combinar los resultados de distintos modelos para reforzar sus respe
 Para hacerlo, construya un modelo ensamblado, es decir, para cada registro, cada modelo realiza una predicción para la categoría. El modelo ensamblado debe asignar a cada registro la categoría más repetida de las tres. Calcule el acierto del modelo resultante. Tome la variable 'models_to_ensemble' como entrada.
 
 ```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-# models_to_ensemble <- data.frame(preds_svm, preds_random_forest, preds_knn)
+models_to_ensemble <- data.frame(preds_svm, preds_random_forest, preds_knn)
 ```
 
 ## Respuesta 7
 
-Escriba su respuesta aquí
+```{r}
+Modes <- function(x) {
+  ux <- unique(x)
+  tab <- tabulate(match(x, ux))
+  ux[tab == max(tab)]
+}
 
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
+total <- apply(models_to_ensemble, 1, Modes)
 ```
+
+```{r}
+sum(total == testData$Comercial)/ length(testData$Comercial)*100
+```
+
+En este caso el error es de 94,74%.
+Esta tecnica suele usarse para mejorar la predicción usando varios modelos distintos (https://en.wikipedia.org/wiki/Ensemble_learning)
 
 ## Pregunta 8
 
@@ -669,8 +699,11 @@ Explique como mínimo una forma alternativa de generar un ensemble (busque en in
 
 ## Respuesta 8
 
-Escriba su respuesta aquí
+El caso de antes era un modelo ensemble por votacion mayoritaria.
+Otras formas alternativas las podemos encontrar en boosting o bootstrap:
 
-```{r,eval=TRUE,echo=TRUE,warning=FALSE, message=FALSE}
-#Escriba su código aquí
-```
+- Boosting: se combinan distintos modelos "debiles" para crear un modelo robusto. Lo que se hace es associarle pesos en función de la exactitud de sus predicciones. (https://en.wikipedia.org/wiki/Boosting_(machine_learning))
+
+-Bootstrap: se generan un numero elevado de muestras a partir de la muestra inicial, lo que nos permiten usar muchos mas modelos. (https://en.wikipedia.org/wiki/Bootstrap_aggregating)
+
+
