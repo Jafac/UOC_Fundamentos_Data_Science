@@ -1,6 +1,6 @@
 ---
 title: 'Reglas de Asociación'
-author: "Autor: Nombre estudiante"
+author: "Autor: Albert Campano"
 date: "Enero 2020"
 output:
   html_document:
@@ -15,6 +15,8 @@ output:
   pdf_document:
     toc: yes
   word_document: default
+editor_options: 
+  chunk_output_type: console
 ---
 ******
 ```{r setup, include=FALSE}
@@ -113,6 +115,7 @@ La generación de reglas de asociación requiere que las características a estu
 
 ```{r,eval=TRUE,echo=TRUE}
 library(arules)
+library(arulesViz)
 data("AdultUCI")
 
 # Proceso de categorización de variables continuas
@@ -271,6 +274,39 @@ Explica qué métodos de discretización acepta esta variable y aplica cada mét
 Es normal, simplemente reducid el númeo de intervalos.
 
 **Respuesta**
+Los métodos que existen son:
+- Frequency: Se generan los intervalos de forma que tengan la misma frecuencia
+- Interval: Los intervalos siempre tienen la misma distancia entre ellos
+- Cluster: Usa k-means para hacer grupos que seran los intervalos
+- Fixed: Nosotros fijamos los intervalos (equivalente a lo que se habia hecho anteriormente)
+
+Usaremos la función **discretize()** con diferentes metodos en cada una de las variables.
+```{r,eval=TRUE,echo=TRUE}
+# Proceso de categorización de variables continuas
+AdultC2 <- AdultUCI
+
+#AdultCX$age <- cut(AdultUCI$age, c(15,25,30,35,45,55,65,100))
+AdultC2$age <- discretize(AdultUCI$age, method = "cluster", breaks = 7)
+AdultC2$workclass <- AdultUCI$workclass
+#AdultC2$fnlwgt <- cut(AdultUCI$fnlwgt, c(12200,20000,50000,100000,500000,750000,1000000,1500000))
+AdultC2$fnlwgt <- discretize(AdultUCI$fnlwgt, method = "frequency", breaks = 7)
+AdultC2$education <- AdultUCI$education
+#AdultC2$`education-num` <- cut(AdultUCI$`education-num`, c(1,5,10,15,20))
+AdultC2$`education-num` <- discretize(AdultUCI$`education-num`, method = "fixed", breaks = c(1,5,10,15,20))
+AdultC2$`marital-status` <- AdultUCI$`marital-status`
+AdultC2$occupation <- AdultUCI$occupation
+AdultC2$relationship <- AdultUCI$relationship
+AdultC2$race <- AdultUCI$race
+AdultC2$sex <- AdultUCI$sex
+#AdultC2$`capital-gain` <- cut(AdultUCI$`capital-gain`, c(0,15000,20000,30000,40000,50000,60000,80000,100000))
+AdultC2$`capital-gain` <- discretize(AdultUCI$`capital-gain`, method = "interval", breaks = 8)
+#AdultC2$`capital-loss` <- cut(AdultUCI$`capital-loss`, c(0,500,1000,2000,3000,4000,5000))
+AdultC2$`capital-loss` <- discretize(AdultUCI$`capital-loss`, method = "interval", breaks = 6)
+#AdultC2$`hours-per-week` <- cut(AdultUCI$`hours-per-week`, c(0,10,20,30,50,60,80,100))
+AdultC2$`hours-per-week` <- discretize(AdultUCI$`hours-per-week`, method = "fixed", breaks = c(0,10,20,30,50,60,80,100))
+AdultC2$`native-country` <- AdultUCI$`native-country`
+AdultC2$income <- AdultUCI$income
+```
 
 
 ******
@@ -281,6 +317,15 @@ Es normal, simplemente reducid el númeo de intervalos.
 3. Comenta 2 reglas
 
 **Respuesta**
+```{r}
+# Listamos las 10 reglas con mayor soporte
+inspect(head(sort(rules, by="support"),10));
+
+first.100.rules <- head(sort(rules, by="support"),100)
+plot(quality(first.100.rules)$support,quality(first.100.rules)$count)
+
+inspect(head(first.100.rules))
+```
 
 
 ******
@@ -291,6 +336,17 @@ Es normal, simplemente reducid el númeo de intervalos.
 3. Genera un gráfico de frecuencias por **coverage**.
 
 **Respuesta**
+```{r}
+#Añadimos una columna coverage
+rules.with.coverage <- rules
+quality(rules.with.coverage) <- cbind(quality(rules.with.coverage), coverage = coverage(rules.with.coverage))
+
+# Listamos las 10 reglas con mayor soporte
+inspect(head(sort(rules.with.coverage, by="coverage"),10));
+
+plot(quality(rules.with.coverage)$coverage,quality(rules.with.coverage)$count)
+```
+
 
 ******
 ## Pregunta 4
