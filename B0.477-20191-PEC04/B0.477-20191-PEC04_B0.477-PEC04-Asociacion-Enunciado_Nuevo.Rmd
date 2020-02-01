@@ -347,6 +347,8 @@ En la segunda regla se dice que si un habitante es de 'raza' blanca, entonces es
 3. Genera un gráfico de frecuencias por **coverage**.
 
 **Respuesta**
+Usando la función **help()** para ver la función **coverage()** podemos saber que esta calcula la cobertura (soporte de la parte derecha) de las reglas.
+
 ```{r}
 #Añadimos una columna coverage
 rules.with.coverage <- rules
@@ -358,18 +360,7 @@ inspect(head(sort(rules.with.coverage, by="coverage"),10));
 plot(quality(rules.with.coverage)$coverage,quality(rules.with.coverage)$count)
 ```
 
-
-2  | Se listan las 10 reglas solicitadas  | 5%
-2  | Se genera y se comenta el gráfico solicitado  | 5%
-2  | Se comentan 2 reglas de las 10 generadas  | 10%
-3  | Se explica para que sirve la función coverage()  | 5%
-3  | Se listan las 10 reglas solicitadas  | 5%
-3  | Se genera y se comenta el gráfico solicitado  | 10%
-4  | Se generan y se muestran los sets solicitados  | 5%
-4  | Se listan las 10 reglas solicitadas  | 10%
-5  | Se explica el significado de los 3 conceptos solicitados  | 5%
-5  | Se explica una regla detallando el significado en la regla del soporte, confianza y elevación  | 10%
-6  | Se plasma a través de una redacción extensa el conocimiento obtenido a partir de las reglas generadas  | 10%
+Dado que la cobertura tambien es un calculo de soporte, deberia seguir una relación similar a la que hemos podido comprobar en la grafica del ejercicio anterior. Exactamente, esta grafica tiene una relación directa entre la cobertura y la frecuencia.
 
 ******
 ## Pregunta 4
@@ -378,7 +369,16 @@ plot(quality(rules.with.coverage)$coverage,quality(rules.with.coverage)$count)
 2. A partir del set de 2 items generado, lista las 5 reglas con mayor soporte.
 
 **Respuesta**
+```{r}
 
+```
+
+
+4  | Se generan y se muestran los sets solicitados  | 5%
+4  | Se listan las 10 reglas solicitadas  | 10%
+5  | Se explica el significado de los 3 conceptos solicitados  | 5%
+5  | Se explica una regla detallando el significado en la regla del soporte, confianza y elevación  | 10%
+6  | Se plasma a través de una redacción extensa el conocimiento obtenido a partir de las reglas generadas  | 10%
 
 ******
 ## Pregunta 5
