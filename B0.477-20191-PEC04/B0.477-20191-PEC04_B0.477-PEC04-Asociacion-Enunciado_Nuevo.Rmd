@@ -370,15 +370,11 @@ Dado que la cobertura tambien es un calculo de soporte, deberia seguir una relac
 
 **Respuesta**
 ```{r}
+two.Items = fsets[size(items(fsets)) == 2];
+inspect(two.Items)
 
+inspect(head(sort(two.Items, by="support"),10));
 ```
-
-
-4  | Se generan y se muestran los sets solicitados  | 5%
-4  | Se listan las 10 reglas solicitadas  | 10%
-5  | Se explica el significado de los 3 conceptos solicitados  | 5%
-5  | Se explica una regla detallando el significado en la regla del soporte, confianza y elevación  | 10%
-6  | Se plasma a través de una redacción extensa el conocimiento obtenido a partir de las reglas generadas  | 10%
 
 ******
 ## Pregunta 5
@@ -388,6 +384,18 @@ Escoje una de las reglas generadas y comenta los valores de soporte, confianza y
 2.  Aplica cada una de las 3 definiciones a la regla seleccionada   
 
 **Respuesta**
+-**Soporte:** Es un indicador de tan frecuente es un itemset en el conjunto de datos.
+-**Confianza:** Es un indicador del grado de fiabilidad de una regla. 
+-**Elevación:** Ratio del soporte observado contra el esperado si 'lhs' y 'rhs' fuesen independientes. Cuando elevación = 1 (independientes entre sí), no se puede establecer ninguna regla. Mayores valores de elevación indican
+asociaciones más fuertes.
+
+Usaremos esta regla:
+lhs                               rhs                            support   confidence lift      count
+{race=White}                   => {native-country=United-States} 0.7881127 0.9217231  1.0270761 38493
+
+El soporte de 0.788 indica que el 78.8% de las habitantes son de 'raza' blanca.
+La confianza de 0.921 indicia que de todos los habitantes de 'raza' blanca, el 92.1% son nativos de Estados Unidos.
+El lift es 1.027 (superior a 1), por tanto, es una regla valida (no lo podemos asegurar con rotundidad dado que el lift solo es ligeramente superior a 1, una buena idea seria hacer un test de Fisher)
 
 
 ******
@@ -397,3 +405,23 @@ El objetivo de todo estudio analítico es la extracción de conocimiento o intel
 Explicad en este apartado qué conocimiento se puede extraer de nuestro juego de datos a partir de las reglas generadas.
 
 **Respuesta**
+Muchas de las reglas, tenian un lift igual (o similar) a uno. Cuando esto pasa las variables son independientes y por tanto, no es posible extraer información de esa regla.
+
+Lo que podemos hacer es calcular si una regla es significativa mediante el test de Fisher. 
+La función **is.significant()** nos indica si una regla es significante comparando el p-value del test de Fisher con el alpha que nosotros decidamos (en este caso 0.05).
+
+Haremos un analisis con las siguientes reglas:
+- Soporte de mas del 60%
+- COnfianza de mas del 80%
+- Lift superior a 1
+- Reglas que sean significantes
+
+```{r}
+metricas <- interestMeasure(rules, measure = c("support", "confidence","lift", "fishersExactTest"), transactions = Adult)
+rules.significant <- is.significant(rules, Adult, method = "fisher", alpha = 0.05)
+quality(rules) <- cbind(metricas, significant = rules.significant)
+subrules.significant <- rules[quality(rules)$support > 0.6 & quality(rules)$confidence > 0.8 & quality(rules)$lift > 1.0 & quality(rules)$significant == TRUE];
+inspect(subrules.significant);
+```
+
+6  | Se plasma a través de una redacción extensa el conocimiento obtenido a partir de las reglas generadas  | 10% 
